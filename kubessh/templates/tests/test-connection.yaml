@@ -8,8 +8,8 @@ metadata:
     "helm.sh/hook": test
 spec:
   containers:
-    - name: wget
+    - name: nc
       image: busybox
-      command: ['wget']
-      args: ['{{ include "kubessh.fullname" . }}:{{ .Values.service.port }}']
+      command: ['sh', '-c']
+      args: ['nc -zv {{ include "kubessh.fullname" . }} {{ .Values.service.port }} && echo "SSH port is open" || exit 1']
   restartPolicy: Never

@@ -109,8 +109,8 @@ export NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].a
 ssh developer@$NODE_IP -p $NODE_PORT
 
 # For ClusterIP (using port-forward)
-kubectl port-forward svc/my-ssh-kubessh 2222:22
-ssh developer@localhost -p 2222
+kubectl port-forward svc/my-ssh-kubessh 22:22
+ssh developer@localhost -p 22
 ```
 
 ## Uninstalling

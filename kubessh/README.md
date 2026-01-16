@@ -164,8 +164,8 @@ ssh myuser@$NODE_IP -p $NODE_PORT
 
 For ClusterIP service (using port-forward):
 ```bash
-kubectl port-forward svc/my-ssh-kubessh 2222:22
-ssh myuser@localhost -p 2222
+kubectl port-forward svc/my-ssh-kubessh 22:22
+ssh myuser@localhost -p 22
 ```
 
 ## Security Considerations
