@@ -59,13 +59,8 @@ spec:
             - name: SUDO_ACCESS
               value: "true"
             {{- end }}
-            {{- if .Values.ssh.config.passwordAuthentication }}
             - name: PASSWORD_ACCESS
-              value: "true"
-            {{- else }}
-            - name: PASSWORD_ACCESS
-              value: "false"
-            {{- end }}
+              value: {{ .Values.ssh.config.passwordAuthentication | ternary "true" "false" | quote }}
             {{- if .Values.ssh.user.publicKeys }}
             - name: PUBLIC_KEY
               value: {{ .Values.ssh.user.publicKeys | join "\n" | quote }}

@@ -17,10 +17,11 @@ service:
 ssh:
   user:
     name: "developer"
-    # WARNING: Using passwords in values files is not secure
-    # Consider using Kubernetes Secrets in production
-    password: "ChangeMe123!"
-    # Add your SSH public keys here (recommended)
+    # WARNING: Using passwords in values files is NOT SECURE for production!
+    # Use Kubernetes Secrets instead. This is for testing/development only.
+    # Leave empty and use publicKeys for production.
+    password: ""
+    # Add your SSH public keys here (recommended over password)
     publicKeys: []
     # - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC..."
     # - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA..."

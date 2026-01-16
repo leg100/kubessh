@@ -106,7 +106,11 @@ ssh:
   # User configuration for SSH access
   user:
     name: "user"
-    # Password for the user (consider using secrets in production)
+    # Password for the user
+    # WARNING: Storing passwords in values.yaml is NOT SECURE for production!
+    # For production, create a Kubernetes Secret and reference it:
+    #   kubectl create secret generic ssh-credentials --from-literal=password=your-password
+    # Then modify deployment.yaml to use: valueFrom.secretKeyRef
     password: ""
     # Public keys for SSH authentication (recommended over password)
     publicKeys: []
