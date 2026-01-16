@@ -1,0 +1,74 @@
+# Example values for development/testing
+# Use this as a reference for common configurations
+
+# Basic SSH server with password authentication
+replicaCount: 1
+
+image:
+  repository: linuxserver/openssh-server
+  pullPolicy: IfNotPresent
+  tag: ""
+
+service:
+  type: LoadBalancer
+  port: 22
+  nodePort: ""
+
+ssh:
+  user:
+    name: "developer"
+    # WARNING: Using passwords in values files is not secure
+    # Consider using Kubernetes Secrets in production
+    password: "ChangeMe123!"
+    # Add your SSH public keys here (recommended)
+    publicKeys: []
+    # - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC..."
+    # - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA..."
+  
+  sudoAccess: false
+  
+  config:
+    passwordAuthentication: true
+    pubkeyAuthentication: true
+    permitRootLogin: false
+    gatewayPorts: false
+  
+  env: []
+  # - name: TZ
+  #   value: "UTC"
+  
+  # Persistence for SSH host keys and user data
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    mountPath: /config
+
+# Resource limits (adjust based on your needs)
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Security context
+podSecurityContext: {}
+  # fsGroup: 1000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: false
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# Node selection
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
