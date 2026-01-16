@@ -1,0 +1,17 @@
+{{- if and .Values.ssh.persistence.enabled (not .Values.ssh.persistence.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "kubessh.fullname" . }}
+  labels:
+    {{- include "kubessh.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.ssh.persistence.accessMode }}
+  {{- if .Values.ssh.persistence.storageClass }}
+  storageClassName: {{ .Values.ssh.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.ssh.persistence.size }}
+{{- end }}

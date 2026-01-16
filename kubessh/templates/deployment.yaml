@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kubessh.fullname" . }}
+  labels:
+    {{- include "kubessh.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kubessh.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kubessh.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kubessh.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: ssh
+              containerPort: 2222
+              protocol: TCP
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            {{- if .Values.ssh.user.name }}
+            - name: USER_NAME
+              value: {{ .Values.ssh.user.name | quote }}
+            {{- end }}
+            {{- if .Values.ssh.user.password }}
+            - name: USER_PASSWORD
+              value: {{ .Values.ssh.user.password | quote }}
+            {{- end }}
+            {{- if .Values.ssh.sudoAccess }}
+            - name: SUDO_ACCESS
+              value: "true"
+            {{- end }}
+            - name: PASSWORD_ACCESS
+              value: {{ .Values.ssh.config.passwordAuthentication | ternary "true" "false" | quote }}
+            {{- if .Values.ssh.user.publicKeys }}
+            - name: PUBLIC_KEY
+              value: {{ .Values.ssh.user.publicKeys | join "\n" | quote }}
+            {{- end }}
+            {{- with .Values.ssh.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- if .Values.ssh.persistence.enabled }}
+            - name: config
+              mountPath: {{ .Values.ssh.persistence.mountPath }}
+            {{- end }}
+            {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        {{- if .Values.ssh.persistence.enabled }}
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ if .Values.ssh.persistence.existingClaim }}{{ .Values.ssh.persistence.existingClaim }}{{- else }}{{ include "kubessh.fullname" . }}{{- end }}
+        {{- end }}
+        {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
